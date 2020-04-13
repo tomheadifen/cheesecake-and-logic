@@ -16,37 +16,63 @@ AWS.config.getCredentials(function(err) {
 console.log('Starting deployment');
 
 
-// Create object upload promise
-const uploadPromise = new AWS.S3({
+// Initialise the sdk object with our credentials (looks at the .env file)
+const api = new AWS.S3({
     apiVersion: '2006-03-01'
 });
 
-uploadFilesToS3();
-
-/** AWS SDK makes it hard to upload folders so have to do one at a time **/
-function uploadFilesToS3() {
-    // Get all files to upload
-    const filesToUpload = glob.sync("./blog/.vuepress/dist/**/*")
-
-    filesToUpload.forEach((filePath) => {
-        // Upload each file to s3 (not directories)
-        if (! fs.statSync(filePath).isDirectory()) {
-            uploadFileToS3(filePath)
+(async function() {
+    // Delete all the current items in the bucket so we don't get conflicts with the new one
+    await api.listObjects({Bucket: process.env.AWS_BUCKET}, (error, data) => {
+        if (data.Contents.lenght > 0) {
+            api.deleteObjects({
+                Bucket: process.env.AWS_BUCKET,
+                Delete: {
+                    // Map for the api request
+                    Objects: data.Contents.map((bucketObject) => { return {Key: bucketObject.Key} })
+                }
+            }, function(error, data) {
+                if (error) {
+                    // an error occurred
+                    console.log(error, error.stack);
+                } else {
+                    console.log(data);
+                }
+            })
+        } else {
+            console.log('The bucket was empty')
         }
     })
-}
 
-function uploadFileToS3(filePath) {
-    const contents = fs.readFileSync(filePath, 'utf8')
+    uploadFilesToS3();
 
-    const params = {
-        Bucket: process.env.AWS_BUCKET,
-        Key: filePath.split('./blog/.vuepress/dist/').pop(),
-        Body: contents
-    };
+    /** AWS SDK makes it hard to upload folders so have to do one at a time **/
+    function uploadFilesToS3() {
+        // Get all files to upload
+        const filesToUpload = glob.sync("./blog/.vuepress/dist/**/*")
 
-    uploadPromise.upload(params, function(err, data) {
-        console.log(err, data);
-    });
-}
+        filesToUpload.forEach((filePath) => {
+            // Upload each file to s3 (not directories)
+            if (! fs.statSync(filePath).isDirectory()) {
+                uploadFileToS3(filePath)
+            }
+        })
+    }
+
+    function uploadFileToS3(filePath) {
+        const contents = fs.readFileSync(filePath, 'utf8')
+
+        const params = {
+            Bucket: process.env.AWS_BUCKET,
+            // The key is the file path on S3
+            Key: filePath.split('./blog/.vuepress/dist/').pop(),
+            Body: contents,
+            ContentType: 'text/html; charset=UTF-8'
+        };
+
+        api.upload(params, function(err, data) {
+            console.log(err, data);
+        });
+    }
+})()
 
