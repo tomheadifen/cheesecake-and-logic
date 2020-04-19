@@ -62,12 +62,22 @@ const api = new AWS.S3({
     function uploadFileToS3(filePath) {
         const contents = fs.readFileSync(filePath, 'utf8')
 
+        // S3 does not set the Conetent type by default sp we have to do this.
+        // Apache servers often do this for us
+        // If we don't do this the site would not load correctly.
+        const extension = filePath.split('.').pop();
+        let contentType = 'application/octet-stream'; // S3 default
+        if (extension == 'html') contentType = "text/html";
+        if (extension == 'css') contentType = "text/css";
+        if (extension == 'js') contentType = "application/javascript";
+        if (extension == 'png' || extension == 'jpg' || extension == 'gif') contentType = "image/" + extension;
+
         const params = {
             Bucket: process.env.AWS_BUCKET,
             // The key is the file path on S3
             Key: filePath.split('./blog/.vuepress/dist/').pop(),
             Body: contents,
-            ContentType: 'text/html; charset=UTF-8'
+            ContentType: contentType
         };
 
         api.upload(params, function(err, data) {
