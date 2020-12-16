@@ -3,6 +3,7 @@ const env = require('dotenv').config();
 const AWS = require("aws-sdk");
 const glob = require("glob")
 
+// For this to work you need to set a .env file with your aws credentials
 AWS.config.getCredentials(function(err) {
   if (err) console.log(err.stack);
   // credentials not loaded
@@ -62,7 +63,7 @@ const api = new AWS.S3({
     function uploadFileToS3(filePath) {
         const contents = fs.readFileSync(filePath, 'utf8')
 
-        // S3 does not set the Conetent type by default sp we have to do this.
+        // S3 does not set the Conetent type by default so we have to do this.
         // Apache servers often do this for us
         // If we don't do this the site would not load correctly.
         const extension = filePath.split('.').pop();
@@ -85,4 +86,3 @@ const api = new AWS.S3({
         });
     }
 })()
-
