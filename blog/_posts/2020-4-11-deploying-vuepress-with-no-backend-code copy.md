@@ -51,7 +51,7 @@ Go ahead and create your S3 Bucket.
 
 
 Follow the docs linked below but when you get to step 7 see the note below.
-<a target='_blank' href='https://docs.aws.amazon.com/AmazonS3/latest/dev/EnableWebsiteHosting.html'>docs.aws.amazon.com/AmazonS3/latest/dev/EnableWebsiteHosting.html</a>
+[https://docs.aws.amazon.com/AmazonS3/latest/dev/EnableWebsiteHosting.html](docs.aws.amazon.com/AmazonS3/latest/dev/EnableWebsiteHosting.html)
 
 On step 7 the docs say this:
 > 7. (Optional) If you want to add a custom error document, in the Error document box, enter the key name for the error document (for example, error.html).
@@ -64,7 +64,7 @@ Great! Next just drag your dist folder into your bucket.
 ## Pointing Route 53 to your S3 Bucket
 To accomplish this you need to follow this tutorial under the ‘Configuring Amazon Route 53 to route traffic to an S3 Bucket’ section.
 
-<a target='_blank' href='https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/RoutingToS3Bucket.html#routing-to-s3-bucket-configuring'>docs.aws.amazon.com/Route53/latest/DeveloperGuide/RoutingToS3Bucket.html#routing-to-s3-bucket-configuring</a>
+[https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/RoutingToS3Bucket.html#routing-to-s3-bucket-configuring](docs.aws.amazon.com/Route53/latest/DeveloperGuide/RoutingToS3Bucket.html#routing-to-s3-bucket-configuring)
 
 After that wait about a minute and you should be able to navigate to your Vuepress site. Note that you don’t have to use Vuepress. You could host a simple “Hello World!” html document.
 
