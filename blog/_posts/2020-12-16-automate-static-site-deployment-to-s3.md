@@ -48,7 +48,7 @@ console.log('Starting deployment')
 // Initialise the sdk object with our credentials (looks at the .env file)
 const api = new AWS.S3({
     apiVersion: '2006-03-01'
-})
+});
 
 (async function() {
     // Delete all the current items in the bucket so we don't get conflicts with the new one
