@@ -1,6 +1,14 @@
 module.exports = {
   title: 'Cheesecake and Logic',
   description: 'This is a blog example built by VuePress',
+  plugins: [
+    [
+      '@vuepress/google-analytics',
+      {
+        'ga': 'G-YKJH9JK217'
+      }
+    ]
+  ],
   theme: '@vuepress/theme-blog', // OR shortcut: @vuepress/blog
   themeConfig: {
     /**
