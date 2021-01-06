@@ -1,11 +1,11 @@
 module.exports = {
   title: 'Cheesecake and Logic',
-  description: 'This is a blog example built by VuePress',
+  description: 'A web development blog',
   plugins: [
     [
       '@vuepress/google-analytics',
       {
-        'ga': 'G-YKJH9JK217'
+        'ga': 'UA-186730726-1'
       }
     ]
   ],
@@ -37,11 +37,11 @@ module.exports = {
       contact: [
         {
           type: 'github',
-          link: 'https://github.com/ulivz',
+          link: 'https://github.com/tomheadifen',
         },
         {
           type: 'twitter',
-          link: 'https://twitter.com/_ulivz',
+          link: 'https://twitter.com/ThomasHeadifen',
         },
       ],
       copyright: [
@@ -50,7 +50,7 @@ module.exports = {
           link: 'https://policies.google.com/privacy?hl=en-US',
         },
         {
-          text: 'MIT Licensed | Copyright © 2018-present Vue.js',
+          text: 'MIT Licensed | Copyright © 2018-present Thomas Headifen',
           link: '',
         },
       ],
