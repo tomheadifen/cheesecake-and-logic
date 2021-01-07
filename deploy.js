@@ -24,7 +24,7 @@ const api = new AWS.S3({
 (async function() {
     // Delete all the current items in the bucket so we don't get conflicts with the new one
     await api.listObjects({Bucket: process.env.AWS_BUCKET}, (error, data) => {
-        if (data.Contents.lenght > 0) {
+        if (data.Contents.length > 0) {
             api.deleteObjects({
                 Bucket: process.env.AWS_BUCKET,
                 Delete: {
@@ -56,8 +56,8 @@ const api = new AWS.S3({
     })
 
     function uploadFileToS3(filePath) {
-        const contents = fs.readFileSync(filePath, 'utf8')
-
+        const contents = fs.readFileSync(filePath)
+        
         // S3 does not set the Conetent type by default so we have to do this.
         // Apache servers often do this for us but with S3 we have to.
         // If we don't do this the site would not load correctly.
@@ -66,7 +66,9 @@ const api = new AWS.S3({
         if (extension == 'html') contentType = "text/html"
         if (extension == 'css') contentType = "text/css"
         if (extension == 'js') contentType = "application/javascript"
-        if (extension == 'png' || extension == 'jpg' || extension == 'gif') contentType = "image/" + extension
+        if (extension == 'png' || extension == 'gif' || extension == 'jpg') {
+            contentType = "image/" + extension
+        }
 
         const params = {
             Bucket: process.env.AWS_BUCKET,
@@ -76,7 +78,7 @@ const api = new AWS.S3({
             ContentType: contentType
         }
 
-        api.upload(params, function(err, data) {
+        api.putObject(params, function(err, data) {
             console.log(err, data)
         })
     }
