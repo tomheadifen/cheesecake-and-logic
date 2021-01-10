@@ -52,29 +52,37 @@ const api = new AWS.S3({
 
 (async function() {
     // Delete all the current items in the bucket so we don't get conflicts with the new one
-    await api.listObjects({Bucket: process.env.AWS_BUCKET}, (error, data) => {
-        if (data.Contents.length > 0) {
-            api.deleteObjects({
-                Bucket: process.env.AWS_BUCKET,
-                Delete: {
-                    // Map for the api request
-                    Objects: data.Contents.map((bucketObject) => { return {Key: bucketObject.Key} })
-                }
-            }, function(error, data) {
-                if (error) {
-                    // an error occurred
-                    console.log(error, error.stack)
-                } else {
-                    console.log(data)
-                }
-            })
-        } else {
-            console.log('The bucket was empty')
-        }
+    await new Promise((resolve, reject) => {
+        api.listObjects({Bucket: process.env.AWS_BUCKET}, (error, data) => {
+            if (data.Contents.length > 0) {
+                console.log('Deleting files');
+                
+                api.deleteObjects({
+                    Bucket: process.env.AWS_BUCKET,
+                    Delete: {
+                        // Map for the api request
+                        Objects: data.Contents.map((bucketObject) => { return {Key: bucketObject.Key} })
+                    }
+                }, function(error, data) {
+                    if (error) {
+                        // an error occurred
+                        console.log(error, error.stack)
+                        reject()
+                    } else {
+                        console.log(data)
+                        resolve()
+                    }
+                })
+            } else {
+                console.log('The bucket was empty')
+                resolve()
+            }
+        })
     })
 
     // Get all files to upload
     const filesToUpload = glob.sync("./blog/.vuepress/dist/**/*")
+
 
     // AWS SDK makes it hard to upload folders so have to do one at a time
     filesToUpload.forEach((filePath) => {
@@ -85,19 +93,23 @@ const api = new AWS.S3({
     })
 
     function uploadFileToS3(filePath) {
+        // If we are retrieving a file that is not an image we have to pass in the utf8 type
+        const imageExtensions = ['png', 'gif', 'jpg', 'svg', 'ico']
+        const extension = filePath.split('.').pop()
         const contents = fs.readFileSync(filePath)
         
-        // S3 does not set the Conetent type by default so we have to do this.
+        // S3 does not set the Content type by default so we have to do this.
         // Apache servers often do this for us but with S3 we have to.
         // If we don't do this the site would not load correctly.
-        const extension = filePath.split('.').pop()
         let contentType = 'application/octet-stream' // S3 default
         if (extension == 'html') contentType = "text/html"
         if (extension == 'css') contentType = "text/css"
         if (extension == 'js') contentType = "application/javascript"
-        if (extension == 'png' || extension == 'gif' || extension == 'jpg') {
+        if (imageExtensions.includes(extension)) {
             contentType = "image/" + extension
         }
+
+        let awsKey = filePath.split('./blog/.vuepress/dist/').pop()
 
         const params = {
             Bucket: process.env.AWS_BUCKET,
@@ -108,7 +120,7 @@ const api = new AWS.S3({
         }
 
         api.putObject(params, function(err, data) {
-            console.log(err, data)
+            console.log('Uploaded: ' + awsKey)
         })
     }
 })()
